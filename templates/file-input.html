@@ -1,9 +1,9 @@
 <html>
 	<h1>
-		{{ .fileID }}
+		{{ .FileID }}
 	</h1>
-    <form action="/upload/{{.fileId}}">
-      <input type="file" id="myFile" name="filename">
+    <form action="/upload/{{ .FileID }}" method="post" enctype="multipart/form-data">
+      <input type="file" id="input-file" name="filename">
       <input type="submit">
     </form>
 </html>
