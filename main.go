@@ -24,6 +24,7 @@ const MAX_FILE_SIZE = 64 << 20 // 64 MiB
 func webserver() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
+	router.Static("/static", "./static")
 
 	router.GET("/request/:fileId", func(c *gin.Context) {
 		fileId := c.Param("fileId")
