@@ -19,6 +19,8 @@ var (
 	lock  sync.Mutex
 )
 
+const MAX_FILE_SIZE = 64 << 20 // 64 MiB
+
 func webserver() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
@@ -41,7 +43,14 @@ func webserver() {
 	})
 
 	router.POST("/upload/:fileId", func(c *gin.Context) {
+		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, MAX_FILE_SIZE)
 		fileId := c.Param("fileId")
+
+		err := c.Request.ParseMultipartForm(MAX_FILE_SIZE)
+		if err != nil {
+			c.String(http.StatusRequestEntityTooLarge, "File too large!")
+			return
+		}
 
 		file, err := c.FormFile("filename")
 		if err != nil {
