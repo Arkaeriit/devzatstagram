@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	//api "github.com/quackduck/devzat/devzatapi"
+	api "github.com/quackduck/devzat/devzatapi"
 )
 
 type FileData struct {
@@ -32,16 +32,18 @@ type PluginConfiguration struct {
 }
 
 var (
-	idMap  = make(map[string]FileData)
-	lock   sync.Mutex
-	config PluginConfiguration
+	idMap         = make(map[string]FileData)
+	lock          sync.Mutex
+	config        PluginConfiguration
+	devzatSession *api.Session
+	devzatLock    sync.Mutex
 )
 
 func loadConfiguration(filePath string) {
 	// Set default values
 	config = PluginConfiguration{
-		MaxStorageSize:      1 << 30,        // 1 GiB
-		MaxFileSize:         256 << 20,      // 256 MiB
+		MaxStorageSize:      1 << 30,   // 1 GiB
+		MaxFileSize:         256 << 20, // 256 MiB
 		FileKeepingDuration: 10 * time.Minute,
 		StoragePath:         "./storage",
 		DevzatHost:          "devzat.hackclub.com:5556",
@@ -98,7 +100,7 @@ func cleanupOldFiles() {
 	defer lock.Unlock()
 
 	cutoffTime := time.Now().Add(-config.FileKeepingDuration)
-	
+
 	for fileId, fileData := range idMap {
 		if fileData.created.Before(cutoffTime) {
 			// Remove the file and directory from storage
@@ -107,7 +109,7 @@ func cleanupOldFiles() {
 			if err != nil {
 				fmt.Printf("Failed to remove file directory %s: %v\n", filePath, err)
 			}
-			
+
 			// Remove from idMap
 			delete(idMap, fileId)
 		}
@@ -120,7 +122,7 @@ func formatFileSize(bytes int) string {
 		MiB = KiB * 1024
 		GiB = MiB * 1024
 	)
-	
+
 	if bytes >= GiB {
 		return fmt.Sprintf("%d GiB", bytes/GiB)
 	} else if bytes >= MiB {
@@ -134,7 +136,7 @@ func formatFileSize(bytes int) string {
 func generateFileID() string {
 	lock.Lock()
 	defer lock.Unlock()
-	
+
 	// Start with 4 hex digits (2 bytes)
 	for length := 2; length <= 16; length++ {
 		// Generate random bytes
@@ -143,16 +145,16 @@ func generateFileID() string {
 		if err != nil {
 			continue // Try again on error
 		}
-		
+
 		// Convert to hex string
 		id := hex.EncodeToString(bytes)
-		
+
 		// Check if this ID is already used
 		if _, exists := idMap[id]; !exists {
 			return id
 		}
 	}
-	
+
 	// Fallback - should never happen with 16 bytes (32 hex chars)
 	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
@@ -165,13 +167,13 @@ func webserver() {
 	router.GET("/request/:fileId", func(c *gin.Context) {
 		// Clean up old files before serving the request
 		cleanupOldFiles()
-		
+
 		fileId := c.Param("fileId")
 		fmt.Println(fileId)
 
 		c.HTML(http.StatusOK, "file-input.html", gin.H{
-			"FileID":        fileId,
-			"MaxFileSize":   formatFileSize(config.MaxFileSize),
+			"FileID":      fileId,
+			"MaxFileSize": formatFileSize(config.MaxFileSize),
 		})
 	})
 
@@ -205,7 +207,7 @@ func webserver() {
 		for _, fileData := range idMap {
 			currentStorageSize += fileData.size
 		}
-		
+
 		if currentStorageSize+int(file.Size) > config.MaxStorageSize {
 			lock.Unlock()
 			c.Redirect(http.StatusSeeOther, "/static/storage-full.html")
@@ -248,6 +250,14 @@ func main() {
 	// Initialize storage directory
 	os.RemoveAll(config.StoragePath)
 	os.Mkdir(config.StoragePath, os.ModePerm)
+
+	// Connect to Devzat
+	var err error
+	devzatSession, err = api.NewSession(config.DevzatHost, config.DevzatToken)
+	if err != nil {
+		fmt.Printf("Error: Failed to connect to Devzat: %v\n", err)
+		os.Exit(1)
+	}
 
 	webserver()
 }
