@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -122,6 +124,32 @@ func formatFileSize(bytes int) string {
 		return fmt.Sprintf("%d KiB", bytes/KiB)
 	}
 	return fmt.Sprintf("%d B", bytes)
+}
+
+func generateFileID() string {
+	lock.Lock()
+	defer lock.Unlock()
+	
+	// Start with 4 hex digits (2 bytes)
+	for length := 2; length <= 16; length++ {
+		// Generate random bytes
+		bytes := make([]byte, length)
+		_, err := rand.Read(bytes)
+		if err != nil {
+			continue // Try again on error
+		}
+		
+		// Convert to hex string
+		id := hex.EncodeToString(bytes)
+		
+		// Check if this ID is already used
+		if _, exists := idMap[id]; !exists {
+			return id
+		}
+	}
+	
+	// Fallback - should never happen with 16 bytes (32 hex chars)
+	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
 func webserver() {
