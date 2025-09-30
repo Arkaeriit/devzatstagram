@@ -164,7 +164,7 @@ func webserver() {
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/static", "./static")
 
-	router.GET("/request/:fileId", func(c *gin.Context) {
+	router.GET("/request/:fileId/:username/:room", func(c *gin.Context) {
 		// Clean up old files before serving the request
 		cleanupOldFiles()
 
@@ -173,6 +173,8 @@ func webserver() {
 
 		c.HTML(http.StatusOK, "file-input.html", gin.H{
 			"FileID":      fileId,
+			"Username":    c.Param("username"),
+			"Room":        c.Param("room"),
 			"MaxFileSize": formatFileSize(config.MaxFileSize),
 		})
 	})
@@ -185,9 +187,11 @@ func webserver() {
 		c.File(config.StoragePath + "/" + fileId + "/" + filename)
 	})
 
-	router.POST("/upload/:fileId", func(c *gin.Context) {
+	router.POST("/upload/:fileId/:username/:room", func(c *gin.Context) {
 		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, int64(config.MaxFileSize))
 		fileId := c.Param("fileId")
+		username := c.Param("username")
+		room := c.Param("room")
 
 		err := c.Request.ParseMultipartForm(int64(config.MaxFileSize))
 		if err != nil {
@@ -230,6 +234,20 @@ func webserver() {
 		lock.Lock()
 		idMap[fileId] = FileData{name: file.Filename, created: time.Now(), size: int(file.Size)}
 		lock.Unlock()
+
+		// Send message to the room with the view URL
+		viewURL := config.WebHost + "/view/" + fileId + "/"
+		devzatLock.Lock()
+		dmErr := devzatSession.SendMessage(api.Message{
+			Room: "#" + room, // Add back the '#' prefix for devzat room
+			From: username,
+			Data: viewURL,
+		})
+		devzatLock.Unlock()
+		
+		if dmErr != nil {
+			fmt.Printf("Error sending message to room: %v\n", dmErr)
+		}
 
 		c.Redirect(http.StatusSeeOther, "/static/upload-success.html")
 	})
@@ -288,7 +306,11 @@ func main() {
 		fileId := generateFileID()
 		
 		// Create the upload link
-		uploadLink := config.WebHost + "/request/" + fileId
+		room := cmdCall.Room
+		if len(room) > 0 && room[0] == '#' {
+			room = room[1:] // Remove leading '#'
+		}
+		uploadLink := config.WebHost + "/request/" + fileId + "/" + cmdCall.From + "/" + room
 		
 		// Send DM to the command sender
 		dmErr := devzatSession.SendMessage(api.Message{
