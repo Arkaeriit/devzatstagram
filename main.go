@@ -24,6 +24,8 @@ type PluginConfiguration struct {
 	MaxFileSize         int
 	FileKeepingDuration time.Duration
 	StoragePath         string
+	DevzatToken         string
+	DevzatHost          string
 }
 
 var (
@@ -39,6 +41,8 @@ func loadConfiguration(filePath string) {
 		MaxFileSize:         256 << 20,      // 256 MiB
 		FileKeepingDuration: 10 * time.Minute,
 		StoragePath:         "./storage",
+		DevzatHost:          "devzat.hackclub.com:5556",
+		// DevzatToken has no default - program will terminate if missing
 	}
 
 	// Read the JSON file
@@ -67,6 +71,18 @@ func loadConfiguration(filePath string) {
 	}
 	if jsonConfig.StoragePath != "" {
 		config.StoragePath = jsonConfig.StoragePath
+	}
+	if jsonConfig.DevzatHost != "" {
+		config.DevzatHost = jsonConfig.DevzatHost
+	}
+	if jsonConfig.DevzatToken != "" {
+		config.DevzatToken = jsonConfig.DevzatToken
+	}
+
+	// Check for required fields
+	if config.DevzatToken == "" {
+		fmt.Printf("Error: DevzatToken is required in configuration file.\n")
+		os.Exit(1)
 	}
 }
 
@@ -169,13 +185,14 @@ func webserver() {
 }
 
 func main() {
-	// Load configuration as first action
+	// Configuration file is required
 	if len(os.Args) < 2 {
-		fmt.Println("Error: No configuration file path provided as argument. Using default configuration.")
-		loadConfiguration("")
-	} else {
-		loadConfiguration(os.Args[1])
+		fmt.Println("Error: Configuration file path is required as argument.")
+		os.Exit(1)
 	}
+
+	// Load configuration
+	loadConfiguration(os.Args[1])
 
 	// Initialize storage directory
 	os.RemoveAll(config.StoragePath)
