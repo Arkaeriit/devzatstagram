@@ -4,6 +4,7 @@
     <link rel="stylesheet" type="text/css" href="/static/style.css">
 </head>
 <body>
+    <h1>Upload your picture</h1>
     <form action="/upload/{{ .FileID }}" method="post" enctype="multipart/form-data">
         <input type="file" id="input-file" name="filename">
         <input type="submit">
