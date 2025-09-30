@@ -16,6 +16,7 @@ import (
 type FileData struct {
 	name    string
 	created time.Time
+	size    int
 }
 
 type PluginConfiguration struct {
@@ -131,6 +132,20 @@ func webserver() {
 			return
 		}
 
+		// Check if adding this file would exceed the storage size limit
+		lock.Lock()
+		currentStorageSize := 0
+		for _, fileData := range idMap {
+			currentStorageSize += fileData.size
+		}
+		
+		if currentStorageSize+int(file.Size) > config.MaxStorageSize {
+			lock.Unlock()
+			c.String(http.StatusInsufficientStorage, "Storage limit exceeded!")
+			return
+		}
+		lock.Unlock()
+
 		err = os.Mkdir(config.StoragePath+"/"+fileId, os.ModePerm)
 		if err != nil {
 			c.String(http.StatusBadRequest, "Dir creation error: %s", err.Error())
@@ -144,7 +159,7 @@ func webserver() {
 		}
 
 		lock.Lock()
-		idMap[fileId] = FileData{name: file.Filename, created: time.Now()}
+		idMap[fileId] = FileData{name: file.Filename, created: time.Now(), size: int(file.Size)}
 		lock.Unlock()
 
 		c.String(http.StatusOK, "File %s uploaded successfully.", file.Filename)
