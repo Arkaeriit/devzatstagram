@@ -242,7 +242,7 @@ func webserver() {
 		if len(displayFilename) > 20 {
 			displayFilename = displayFilename[len(displayFilename)-20:]
 		}
-		
+
 		viewURL := config.WebHost + "/view/" + fileId + "/" + displayFilename
 		markdownImage := fmt.Sprintf("![%s ](%s)", viewURL, viewURL)
 		devzatLock.Lock()
@@ -252,7 +252,7 @@ func webserver() {
 			Data: markdownImage,
 		})
 		devzatLock.Unlock()
-		
+
 		if dmErr != nil {
 			fmt.Printf("Error sending message to room: %v\n", dmErr)
 		}
@@ -304,7 +304,7 @@ func main() {
 	err = devzatSession.RegisterCmd("devzatstagram", "", "Get a link to upload a picture", func(cmdCall api.CmdCall, err error) {
 		devzatLock.Lock()
 		defer devzatLock.Unlock()
-		
+
 		if err != nil {
 			fmt.Printf("Error in devzatstagram command: %v\n", err)
 			return
@@ -312,26 +312,26 @@ func main() {
 
 		// Generate a unique file ID
 		fileId := generateFileID()
-		
+
 		// Create the upload link
 		room := cmdCall.Room
 		if len(room) > 0 && room[0] == '#' {
 			room = room[1:] // Remove leading '#'
 		}
 		uploadLink := config.WebHost + "/request/" + fileId + "/" + cmdCall.From + "/" + room
-		
+
 		// Send DM to the command sender
 		dmErr := devzatSession.SendMessage(api.Message{
 			Room: cmdCall.Room,
 			DMTo: cmdCall.From,
 			Data: fmt.Sprintf("Use this link to upload a picture: %s", uploadLink),
 		})
-		
+
 		if dmErr != nil {
 			fmt.Printf("Error sending DM: %v\n", dmErr)
 		}
 	})
-	
+
 	if err != nil {
 		fmt.Printf("Error registering devzatstagram command: %v\n", err)
 		os.Exit(1)
