@@ -244,7 +244,7 @@ func webserver() {
 		}
 		
 		viewURL := config.WebHost + "/view/" + fileId + "/" + displayFilename
-		markdownImage := fmt.Sprintf("![%s](%s)", viewURL, viewURL)
+		markdownImage := fmt.Sprintf("![%s ](%s)", viewURL, viewURL)
 		devzatLock.Lock()
 		dmErr := devzatSession.SendMessage(api.Message{
 			Room: "#" + room, // Add back the '#' prefix for devzat room
