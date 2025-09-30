@@ -259,5 +259,38 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Register devzatstagram command
+	err = devzatSession.RegisterCmd("devzatstagram", "", "Get a link to upload a picture", func(cmdCall api.CmdCall, err error) {
+		devzatLock.Lock()
+		defer devzatLock.Unlock()
+		
+		if err != nil {
+			fmt.Printf("Error in devzatstagram command: %v\n", err)
+			return
+		}
+
+		// Generate a unique file ID
+		fileId := generateFileID()
+		
+		// Create the upload link
+		uploadLink := config.WebHost + "/request/" + fileId
+		
+		// Send DM to the command sender
+		dmErr := devzatSession.SendMessage(api.Message{
+			Room: cmdCall.Room,
+			DMTo: cmdCall.From,
+			Data: fmt.Sprintf("Use this link to upload a picture: %s", uploadLink),
+		})
+		
+		if dmErr != nil {
+			fmt.Printf("Error sending DM: %v\n", dmErr)
+		}
+	})
+	
+	if err != nil {
+		fmt.Printf("Error registering devzatstagram command: %v\n", err)
+		os.Exit(1)
+	}
+
 	webserver()
 }
