@@ -12,11 +12,22 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    position: relative;
     background: 
         radial-gradient(circle at 0% 0%, #e8d5ff 20%, transparent 50%),     /* purple top left */
         radial-gradient(circle at 0% 100%, #fff2a6 20%, transparent 50%),   /* yellow bottom left */
         radial-gradient(circle at 100% 50%, #ffb3d9 30%, transparent 60%),  /* magenta right */
         linear-gradient(135deg, #ffeef7, #f0f8ff);                         /* subtle base gradient */
+}
+
+.file-limit {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.8em;
+    color: black;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
 }
 
 h1 {

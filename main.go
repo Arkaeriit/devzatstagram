@@ -107,6 +107,23 @@ func cleanupOldFiles() {
 	}
 }
 
+func formatFileSize(bytes int) string {
+	const (
+		KiB = 1024
+		MiB = KiB * 1024
+		GiB = MiB * 1024
+	)
+	
+	if bytes >= GiB {
+		return fmt.Sprintf("%d GiB", bytes/GiB)
+	} else if bytes >= MiB {
+		return fmt.Sprintf("%d MiB", bytes/MiB)
+	} else if bytes >= KiB {
+		return fmt.Sprintf("%d KiB", bytes/KiB)
+	}
+	return fmt.Sprintf("%d B", bytes)
+}
+
 func webserver() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
@@ -120,7 +137,8 @@ func webserver() {
 		fmt.Println(fileId)
 
 		c.HTML(http.StatusOK, "file-input.html", gin.H{
-			"FileID": fileId,
+			"FileID":        fileId,
+			"MaxFileSize":   formatFileSize(config.MaxFileSize),
 		})
 	})
 
