@@ -28,6 +28,7 @@ type PluginConfiguration struct {
 	StoragePath         string
 	DevzatToken         string
 	DevzatHost          string
+	WebHost             string
 }
 
 var (
@@ -44,6 +45,7 @@ func loadConfiguration(filePath string) {
 		FileKeepingDuration: 10 * time.Minute,
 		StoragePath:         "./storage",
 		DevzatHost:          "devzat.hackclub.com:5556",
+		WebHost:             "http://localhost:8080",
 		// DevzatToken has no default - program will terminate if missing
 	}
 
@@ -79,6 +81,9 @@ func loadConfiguration(filePath string) {
 	}
 	if jsonConfig.DevzatToken != "" {
 		config.DevzatToken = jsonConfig.DevzatToken
+	}
+	if jsonConfig.WebHost != "" {
+		config.WebHost = jsonConfig.WebHost
 	}
 
 	// Check for required fields
