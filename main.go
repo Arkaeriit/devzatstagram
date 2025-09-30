@@ -175,7 +175,7 @@ func webserver() {
 		
 		if currentStorageSize+int(file.Size) > config.MaxStorageSize {
 			lock.Unlock()
-			c.String(http.StatusInsufficientStorage, "Storage limit exceeded!")
+			c.Redirect(http.StatusSeeOther, "/static/storage-full.html")
 			return
 		}
 		lock.Unlock()
@@ -196,7 +196,7 @@ func webserver() {
 		idMap[fileId] = FileData{name: file.Filename, created: time.Now(), size: int(file.Size)}
 		lock.Unlock()
 
-		c.String(http.StatusOK, "File %s uploaded successfully.", file.Filename)
+		c.Redirect(http.StatusSeeOther, "/static/upload-success.html")
 	})
 
 	router.Run("localhost:8080")
