@@ -179,8 +179,9 @@ func webserver() {
 		})
 	})
 
-	router.GET("/view/:fileId/", func(c *gin.Context) {
+	router.GET("/view/:fileId/:filename", func(c *gin.Context) {
 		fileId := c.Param("fileId")
+		// filename parameter is ignored
 		lock.Lock()
 		filename := idMap[fileId].name
 		lock.Unlock()
@@ -235,13 +236,20 @@ func webserver() {
 		idMap[fileId] = FileData{name: file.Filename, created: time.Now(), size: int(file.Size)}
 		lock.Unlock()
 
-		// Send message to the room with the view URL
-		viewURL := config.WebHost + "/view/" + fileId + "/"
+		// Send message to the room with the view URL as markdown image
+		// Truncate filename to last 20 characters if longer
+		displayFilename := file.Filename
+		if len(displayFilename) > 20 {
+			displayFilename = displayFilename[len(displayFilename)-20:]
+		}
+		
+		viewURL := config.WebHost + "/view/" + fileId + "/" + displayFilename
+		markdownImage := fmt.Sprintf("![%s](%s)", viewURL, viewURL)
 		devzatLock.Lock()
 		dmErr := devzatSession.SendMessage(api.Message{
 			Room: "#" + room, // Add back the '#' prefix for devzat room
 			From: username,
-			Data: viewURL,
+			Data: markdownImage,
 		})
 		devzatLock.Unlock()
 		
