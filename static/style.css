@@ -1,0 +1,32 @@
+* {
+    font-family: 'Courier New', Courier, monospace;
+    color: black;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: white;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+input[type="file"] {
+    font-family: 'Courier New', Courier, monospace;
+    color: black;
+}
+
+input[type="submit"] {
+    font-family: 'Courier New', Courier, monospace;
+    color: black;
+    padding: 5px 10px;
+}
