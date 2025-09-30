@@ -177,6 +177,9 @@ func main() {
 		loadConfiguration(os.Args[1])
 	}
 
-	fmt.Println("Coucou")
+	// Initialize storage directory
+	os.RemoveAll(config.StoragePath)
+	os.Mkdir(config.StoragePath, os.ModePerm)
+
 	webserver()
 }
