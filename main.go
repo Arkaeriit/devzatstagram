@@ -19,6 +19,7 @@ type FileData struct {
 	name    string
 	created time.Time
 	size    int
+	usable  bool
 }
 
 type PluginConfiguration struct {
@@ -159,6 +160,17 @@ func generateFileID() string {
 	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
+func checkFileUsable(fileId string) bool {
+	lock.Lock()
+	defer lock.Unlock()
+
+	fileData, exists := idMap[fileId]
+	if !exists {
+		return false
+	}
+	return fileData.usable
+}
+
 func webserver() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
@@ -174,6 +186,12 @@ func webserver() {
 
 		fileId := c.Param("fileId")
 		fmt.Println(fileId)
+
+		if !checkFileUsable(fileId) {
+			c.Status(http.StatusNotFound)
+			c.File("./static/404.html")
+			return
+		}
 
 		c.HTML(http.StatusOK, "file-input.html", gin.H{
 			"FileID":      fileId,
@@ -197,6 +215,12 @@ func webserver() {
 		fileId := c.Param("fileId")
 		username := c.Param("username")
 		room := c.Param("room")
+
+		if !checkFileUsable(fileId) {
+			c.Status(http.StatusNotFound)
+			c.File("./static/404.html")
+			return
+		}
 
 		err := c.Request.ParseMultipartForm(int64(config.MaxFileSize))
 		if err != nil {
@@ -237,7 +261,7 @@ func webserver() {
 		}
 
 		lock.Lock()
-		idMap[fileId] = FileData{name: file.Filename, created: time.Now(), size: int(file.Size)}
+		idMap[fileId] = FileData{name: file.Filename, created: time.Now(), size: int(file.Size), usable: false}
 		lock.Unlock()
 
 		// Send message to the room with the view URL as markdown image
@@ -316,6 +340,11 @@ func main() {
 
 		// Generate a unique file ID
 		fileId := generateFileID()
+
+		// Add to idMap with usable set to true
+		lock.Lock()
+		idMap[fileId] = FileData{usable: true, created: time.Now()}
+		lock.Unlock()
 
 		// Create the upload link
 		room := cmdCall.Room
