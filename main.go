@@ -232,9 +232,23 @@ func webserver() {
 		fileId := c.Param("fileId")
 		// filename parameter is ignored
 		lock.Lock()
-		filename := idMap[fileId].name
+		fileData, exists := idMap[fileId]
 		lock.Unlock()
-		c.File(config.StoragePath + "/" + fileId + "/" + filename)
+
+		if !exists {
+			c.Status(http.StatusNotFound)
+			c.File("./static/404.html")
+			return
+		}
+
+		filePath := config.StoragePath + "/" + fileId + "/" + fileData.name
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			c.Status(http.StatusNotFound)
+			c.File("./static/404.html")
+			return
+		}
+
+		c.File(filePath)
 	})
 
 	router.POST("/upload/:fileId/:username/:room", func(c *gin.Context) {
