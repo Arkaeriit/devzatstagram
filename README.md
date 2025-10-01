@@ -1,6 +1,16 @@
 # Devzatstagram
 
-A picture sharing service integrated with Devzat.
+A Devzat plugin to add in-chat image sharing support.
+
+![In-chat use](https://devzatstagram.bobignou.red/static/in-chat-use.png)
+
+## Running it
+
+To run it on your Devzat instance, simply build it and run it with a JSON config file as argument.
+
+```
+./devzatstagram config.json
+```
 
 ## Configuration
 
@@ -10,11 +20,11 @@ The application requires a JSON configuration file to be passed as a command-lin
 |-----------------------|----------------------------------------------------------|--------------------------------------------------------|
 | `MaxStorageSize`      | Maximum total storage size in bytes                      | `1073741824` (1 GiB)                                   |
 | `MaxFileSize`         | Maximum individual file size in bytes                    | `268435456` (256 MiB)                                  |
-| `FileKeepingDuration` | Duration to keep files before automatic cleanup (as Go duration string) | `"10m"`                                     |
+| `FileKeepingDuration` | Duration to keep files before automatic cleanup          | `"10m"`                                                |
 | `StoragePath`         | Directory path where uploaded files are stored           | `"./storage"`                                          |
 | `DevzatToken`         | Authentication token for Devzat integration (required)   | *No default - must be provided*                        |
 | `DevzatHost`          | Devzat server host and port                              | `"devzat.hackclub.com:5556"`                           |
-| `WebHost`             | Public URL of the web server                             | Constructed from `WebPort`: `"http://localhost:8080"` |
+| `WebHost`             | Public URL of the web server                             | Constructed from `WebPort`: `"http://localhost:8080"`  |
 | `WebPort`             | Port number for the web server                           | `8080`                                                 |
 | `Debug`               | Enable debug mode (verbose logging)                      | `false`                                                |
 
