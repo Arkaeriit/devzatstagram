@@ -164,6 +164,10 @@ func webserver() {
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/static", "./static")
 
+	router.NoRoute(func(c *gin.Context) {
+		c.File("./static/404.html")
+	})
+
 	router.GET("/request/:fileId/:username/:room", func(c *gin.Context) {
 		// Clean up old files before serving the request
 		cleanupOldFiles()
