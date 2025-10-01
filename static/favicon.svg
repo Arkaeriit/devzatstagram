@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="10mm"
+   height="10mm"
+   viewBox="0 0 10 10"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (unknown)"
+   sodipodi:docname="favicon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="11.388664"
+     inkscape:cx="60.630463"
+     inkscape:cy="28.844471"
+     inkscape:window-width="1920"
+     inkscape:window-height="1008"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient278"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffca00;stop-opacity:1;"
+         offset="0"
+         id="stop279" />
+      <stop
+         style="stop-color:#e5ff00;stop-opacity:1;"
+         offset="1"
+         id="stop280" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : -138.5 : 1"
+       inkscape:vp_y="0 : 999.99994 : 0"
+       inkscape:vp_z="238.25031 : -160.80288 : 1"
+       inkscape:persp3d-origin="105 : -188 : 1"
+       id="perspective1" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient278"
+       id="linearGradient280"
+       x1="78.596893"
+       y1="114.65393"
+       x2="80.136772"
+       y2="114.65393"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(4.1492055,0,0,4.1492055,-325.20332,-469.3495)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:13.1737px;font-family:'IBM Plex Mono';-inkscape-font-specification:'IBM Plex Mono Medium';writing-mode:lr-tb;direction:ltr;fill:url(#linearGradient280);fill-rule:nonzero;stroke-width:1.09781"
+       x="0.22629851"
+       y="10.312173"
+       id="text11"
+       transform="scale(1.2518526,0.7988161)"><tspan
+         sodipodi:role="line"
+         id="tspan11"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-family:'IBM Plex Mono';-inkscape-font-specification:'IBM Plex Mono Medium';fill:url(#linearGradient280);fill-opacity:1;stroke-width:1.09781"
+         x="0.22629851"
+         y="10.312173">@</tspan></text>
+  </g>
+</svg>
