@@ -176,6 +176,10 @@ func webserver() {
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/static", "./static")
 
+	router.GET("/", func(c *gin.Context) {
+		c.File("./static/index.html")
+	})
+
 	router.NoRoute(func(c *gin.Context) {
 		c.File("./static/404.html")
 	})
