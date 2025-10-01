@@ -317,21 +317,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Register middleware to intercept and hide devzatstagram commands from other users
-	messageChan, middlewareResponseChan, err := devzatSession.RegisterListener(true, false, `^devzatstagram`)
-	if err != nil {
-		fmt.Printf("Error registering middleware: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Handle middleware messages in a goroutine
-	go func() {
-		for range messageChan {
-			// Hide the command from other users by returning empty string
-			middlewareResponseChan <- ""
-		}
-	}()
-
 	// Register devzatstagram command
 	err = devzatSession.RegisterCmd("devzatstagram", "", "Get a link to upload a picture", func(cmdCall api.CmdCall, err error) {
 		devzatLock.Lock()
