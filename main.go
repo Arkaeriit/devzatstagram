@@ -62,44 +62,48 @@ func loadConfiguration(filePath string) {
 		return
 	}
 
-	// Parse JSON into a temporary struct to handle missing fields
-	var jsonConfig PluginConfiguration
-	if err := json.Unmarshal(data, &jsonConfig); err != nil {
+	// Parse JSON into a map to handle duration as string
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal(data, &jsonData); err != nil {
 		fmt.Printf("Failed to parse JSON config: %v. Using default configuration.\n", err)
 		return
 	}
 
-	// Override defaults with values from JSON (only if they are not zero values)
-	if jsonConfig.MaxStorageSize != 0 {
-		config.MaxStorageSize = jsonConfig.MaxStorageSize
+	// Override defaults with values from JSON
+	if v, ok := jsonData["MaxStorageSize"].(float64); ok {
+		config.MaxStorageSize = int(v)
 	}
-	if jsonConfig.MaxFileSize != 0 {
-		config.MaxFileSize = jsonConfig.MaxFileSize
+	if v, ok := jsonData["MaxFileSize"].(float64); ok {
+		config.MaxFileSize = int(v)
 	}
-	if jsonConfig.FileKeepingDuration != 0 {
-		config.FileKeepingDuration = jsonConfig.FileKeepingDuration
+	if v, ok := jsonData["FileKeepingDuration"].(string); ok {
+		if duration, err := time.ParseDuration(v); err == nil {
+			config.FileKeepingDuration = duration
+		} else {
+			fmt.Printf("Warning: Failed to parse FileKeepingDuration: %v. Using default.\n", err)
+		}
 	}
-	if jsonConfig.StoragePath != "" {
-		config.StoragePath = jsonConfig.StoragePath
+	if v, ok := jsonData["StoragePath"].(string); ok {
+		config.StoragePath = v
 	}
-	if jsonConfig.DevzatHost != "" {
-		config.DevzatHost = jsonConfig.DevzatHost
+	if v, ok := jsonData["DevzatHost"].(string); ok {
+		config.DevzatHost = v
 	}
-	if jsonConfig.DevzatToken != "" {
-		config.DevzatToken = jsonConfig.DevzatToken
+	if v, ok := jsonData["DevzatToken"].(string); ok {
+		config.DevzatToken = v
 	}
-	if jsonConfig.WebPort != 0 {
-		config.WebPort = jsonConfig.WebPort
+	if v, ok := jsonData["WebPort"].(float64); ok {
+		config.WebPort = int(v)
 	}
-	if jsonConfig.WebHost != "" {
-		config.WebHost = jsonConfig.WebHost
+	if v, ok := jsonData["WebHost"].(string); ok {
+		config.WebHost = v
 	} else {
 		// If WebHost not set, construct from WebPort
 		config.WebHost = fmt.Sprintf("http://localhost:%d", config.WebPort)
 	}
-	// Debug is a boolean, so we need to check if it was explicitly set in the JSON
-	// Since we can't distinguish false from zero value, we accept the parsed value
-	config.Debug = jsonConfig.Debug
+	if v, ok := jsonData["Debug"].(bool); ok {
+		config.Debug = v
+	}
 
 	// Check for required fields
 	if config.DevzatToken == "" {

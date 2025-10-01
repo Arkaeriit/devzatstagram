@@ -10,7 +10,7 @@ The application requires a JSON configuration file to be passed as a command-lin
 |-----------------------|----------------------------------------------------------|--------------------------------------------------------|
 | `MaxStorageSize`      | Maximum total storage size in bytes                      | `1073741824` (1 GiB)                                   |
 | `MaxFileSize`         | Maximum individual file size in bytes                    | `268435456` (256 MiB)                                  |
-| `FileKeepingDuration` | Duration to keep files before automatic cleanup (in nanoseconds) | `600000000000` (10 minutes)                |
+| `FileKeepingDuration` | Duration to keep files before automatic cleanup (as Go duration string) | `"10m"`                                     |
 | `StoragePath`         | Directory path where uploaded files are stored           | `"./storage"`                                          |
 | `DevzatToken`         | Authentication token for Devzat integration (required)   | *No default - must be provided*                        |
 | `DevzatHost`          | Devzat server host and port                              | `"devzat.hackclub.com:5556"`                           |
@@ -25,7 +25,7 @@ The application requires a JSON configuration file to be passed as a command-lin
   "DevzatToken": "your-token-here",
   "MaxStorageSize": 2147483648,
   "MaxFileSize": 536870912,
-  "FileKeepingDuration": 1200000000000,
+  "FileKeepingDuration": "20m",
   "WebPort": 3000,
   "Debug": true
 }
@@ -36,4 +36,5 @@ The application requires a JSON configuration file to be passed as a command-lin
 - **DevzatToken** is required and the application will exit if not provided
 - If `WebHost` is not specified, it will automatically be constructed as `http://localhost:{WebPort}`
 - If you want to use a custom domain or external URL, explicitly set `WebHost` in your configuration
-- `FileKeepingDuration` is specified in nanoseconds (e.g., `600000000000` = 10 minutes)
+- `FileKeepingDuration` uses Go's duration string format: valid units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`
+  - Examples: `"10m"` (10 minutes), `"1h30m"` (1 hour 30 minutes), `"30s"` (30 seconds)
