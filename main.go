@@ -30,6 +30,7 @@ type PluginConfiguration struct {
 	DevzatToken         string
 	DevzatHost          string
 	WebHost             string
+	Debug               bool
 }
 
 var (
@@ -49,6 +50,7 @@ func loadConfiguration(filePath string) {
 		StoragePath:         "./storage",
 		DevzatHost:          "devzat.hackclub.com:5556",
 		WebHost:             "http://localhost:8080",
+		Debug:               false,
 		// DevzatToken has no default - program will terminate if missing
 	}
 
@@ -88,6 +90,9 @@ func loadConfiguration(filePath string) {
 	if jsonConfig.WebHost != "" {
 		config.WebHost = jsonConfig.WebHost
 	}
+	// Debug is a boolean, so we need to check if it was explicitly set in the JSON
+	// Since we can't distinguish false from zero value, we accept the parsed value
+	config.Debug = jsonConfig.Debug
 
 	// Check for required fields
 	if config.DevzatToken == "" {
@@ -172,6 +177,13 @@ func checkFileUsable(fileId string) bool {
 }
 
 func webserver() {
+	// Set gin mode based on debug configuration
+	if config.Debug {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/static", "./static")
