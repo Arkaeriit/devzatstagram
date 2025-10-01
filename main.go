@@ -30,6 +30,7 @@ type PluginConfiguration struct {
 	DevzatToken         string
 	DevzatHost          string
 	WebHost             string
+	WebPort             int
 	Debug               bool
 }
 
@@ -49,7 +50,7 @@ func loadConfiguration(filePath string) {
 		FileKeepingDuration: 10 * time.Minute,
 		StoragePath:         "./storage",
 		DevzatHost:          "devzat.hackclub.com:5556",
-		WebHost:             "http://localhost:8080",
+		WebPort:             8080,
 		Debug:               false,
 		// DevzatToken has no default - program will terminate if missing
 	}
@@ -87,8 +88,14 @@ func loadConfiguration(filePath string) {
 	if jsonConfig.DevzatToken != "" {
 		config.DevzatToken = jsonConfig.DevzatToken
 	}
+	if jsonConfig.WebPort != 0 {
+		config.WebPort = jsonConfig.WebPort
+	}
 	if jsonConfig.WebHost != "" {
 		config.WebHost = jsonConfig.WebHost
+	} else {
+		// If WebHost not set, construct from WebPort
+		config.WebHost = fmt.Sprintf("http://localhost:%d", config.WebPort)
 	}
 	// Debug is a boolean, so we need to check if it was explicitly set in the JSON
 	// Since we can't distinguish false from zero value, we accept the parsed value
@@ -304,7 +311,7 @@ func webserver() {
 		c.Redirect(http.StatusSeeOther, "/static/upload-success.html")
 	})
 
-	router.Run("localhost:8080")
+	router.Run(fmt.Sprintf("localhost:%d", config.WebPort))
 }
 
 func main() {
